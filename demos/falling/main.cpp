@@ -400,17 +400,17 @@ void LoadPath(PQP_REAL (* &R)[3][3], PQP_REAL (* &T)[3], char *filename)
   {
     double a, b, c;
     fscanf(fp,"%lf %lf %lf",&a,&b,&c);
-    R[i][0][0] = (PQP_REAL)a;
-    R[i][0][1] = (PQP_REAL)b;
-    R[i][0][2] = (PQP_REAL)c;
+    R[i](0,0) = (PQP_REAL)a;
+    R[i](0,1) = (PQP_REAL)b;
+    R[i](0,2) = (PQP_REAL)c;
     fscanf(fp,"%lf %lf %lf",&a,&b,&c);
-    R[i][1][0] = (PQP_REAL)a;
-    R[i][1][1] = (PQP_REAL)b;
-    R[i][1][2] = (PQP_REAL)c;
+    R[i](1,0) = (PQP_REAL)a;
+    R[i](1,1) = (PQP_REAL)b;
+    R[i](1,2) = (PQP_REAL)c;
     fscanf(fp,"%lf %lf %lf",&a,&b,&c);
-    R[i][2][0] = (PQP_REAL)a;
-    R[i][2][1] = (PQP_REAL)b;
-    R[i][2][2] = (PQP_REAL)c;
+    R[i](2,0) = (PQP_REAL)a;
+    R[i](2,1) = (PQP_REAL)b;
+    R[i](2,2) = (PQP_REAL)c;
     fscanf(fp,"%lf %lf %lf",&a,&b,&c);
     T[i][0] = (PQP_REAL)a;
     T[i][1] = (PQP_REAL)b;

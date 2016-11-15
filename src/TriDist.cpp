@@ -47,6 +47,7 @@
 //--------------------------------------------------------------------------
 
 #include "MatVec.h"
+#include "Tri.h"
 #ifdef _WIN32
 #include <float.h>
 #define isnan _isnan
@@ -64,13 +65,13 @@
 //--------------------------------------------------------------------------
 
 void
-SegPoints(PQP_REAL VEC[3], 
-	  PQP_REAL X[3], PQP_REAL Y[3],             // closest points
-          const PQP_REAL P[3], const PQP_REAL A[3], // seg 1 origin, vector
-          const PQP_REAL Q[3], const PQP_REAL B[3]) // seg 2 origin, vector
+SegPoints(Vector& VEC,
+          Vector& X, Vector& Y,             // closest points
+          const Vector& P, const Vector& A, // seg 1 origin, vector
+          const Vector& Q, const Vector& B) // seg 2 origin, vector
 {
-  PQP_REAL T[3], A_dot_A, B_dot_B, A_dot_B, A_dot_T, B_dot_T;
-  PQP_REAL TMP[3];
+  Vector T, TMP;
+  PQP_REAL A_dot_A, B_dot_B, A_dot_B, A_dot_T, B_dot_T;
 
   VmV(T,Q,P);
   A_dot_A = VdotV(A,A);
@@ -185,13 +186,13 @@ SegPoints(PQP_REAL VEC[3],
 //--------------------------------------------------------------------------
 
 PQP_REAL 
-TriDist(PQP_REAL P[3], PQP_REAL Q[3],
-        const PQP_REAL S[3][3], const PQP_REAL T[3][3])  
+TriDist(Vector &P, Vector &Q,
+        const Tri& S, const  Tri& T)
 {
   // Compute vectors along the 6 sides
 
-  PQP_REAL Sv[3][3], Tv[3][3];
-  PQP_REAL VEC[3];
+  Vector Sv[3], Tv[3];
+  Vector VEC;
 
   VmV(Sv[0],S[1],S[0]);
   VmV(Sv[1],S[2],S[1]);
@@ -209,9 +210,8 @@ TriDist(PQP_REAL P[3], PQP_REAL Q[3],
   // Even if these tests fail, it may be helpful to know the closest
   // points found, and whether the triangles were shown disjoint
 
-  PQP_REAL V[3];
-  PQP_REAL Z[3];
-  PQP_REAL minP[3], minQ[3], mindd;
+  Vector V, minP, minQ, Z;
+  PQP_REAL mindd;
   int shown_disjoint = 0;
 
   mindd = VdistV2(S[0],T[0]) + 1;  // Set first minimum safely high
@@ -269,7 +269,8 @@ TriDist(PQP_REAL P[3], PQP_REAL Q[3],
 
   // First check for case 1
 
-  PQP_REAL Sn[3], Snl;       
+  Vector Sn;
+  PQP_REAL Snl;
   VcrossV(Sn,Sv[0],Sv[1]); // Compute normal to S triangle
   Snl = VdotV(Sn,Sn);      // Compute square of length of normal
   
@@ -279,7 +280,7 @@ TriDist(PQP_REAL P[3], PQP_REAL Q[3],
   {
     // Get projection lengths of T points
 
-    PQP_REAL Tp[3]; 
+    Vector Tp;
 
     VmV(V,S[0],T[0]);
     Tp[0] = VdotV(V,Sn);
@@ -338,13 +339,14 @@ TriDist(PQP_REAL P[3], PQP_REAL Q[3],
     }
   }
 
-  PQP_REAL Tn[3], Tnl;       
+  Vector Tn;
+  PQP_REAL Tnl;
   VcrossV(Tn,Tv[0],Tv[1]); 
   Tnl = VdotV(Tn,Tn);      
   
   if (Tnl > 1e-15)  
   {
-    PQP_REAL Sp[3]; 
+    Vector Sp;
 
     VmV(V,T[0],S[0]);
     Sp[0] = VdotV(V,Tn);

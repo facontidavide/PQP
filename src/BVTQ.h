@@ -63,8 +63,8 @@ struct BVT
 { 
   PQP_REAL d;       // distance between the bvs
   int b1, b2;       // bv numbers - b1 is from model 1, b2 from model 2
-  PQP_REAL R[3][3]; // the relative rotation from b1 to b2
-  PQP_REAL T[3];    // the relative translation from b1 to b2
+  Matrix R; // the relative rotation from b1 to b2
+  Vector T;    // the relative translation from b1 to b2
   int pindex;       // the index of the pointer that points to this -
                     // needed when filling the hole left by an ExtractMin
 };

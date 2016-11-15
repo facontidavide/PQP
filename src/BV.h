@@ -47,17 +47,17 @@
 
 struct BV
 {
-  PQP_REAL R[3][3];     // orientation of RSS & OBB
+  Matrix R;     // orientation of RSS & OBB
 
 #if PQP_BV_TYPE & RSS_TYPE
-  PQP_REAL Tr[3];       // position of rectangle
+  Vector Tr;       // position of rectangle
   PQP_REAL l[2];        // side lengths of rectangle
   PQP_REAL r;           // radius of sphere summed with rectangle to form RSS
 #endif
 
 #if PQP_BV_TYPE & OBB_TYPE
-  PQP_REAL To[3];       // position of obb
-  PQP_REAL d[3];        // (half) dimensions of obb
+  Vector To;       // position of obb
+  Vector d;        // (half) dimensions of obb
 #endif
 
   int first_child;      // positive value is index of first_child bv
@@ -67,7 +67,7 @@ struct BV
   ~BV();
   int      Leaf()    { return first_child < 0; }
   PQP_REAL GetSize(); 
-  void     FitToTris(PQP_REAL O[3][3], Tri *tris, int num_tris);
+  void     FitToTris(Matrix& O, Tri *tris, int num_tris);
 };
 
 inline
@@ -82,11 +82,11 @@ BV::GetSize()
 }
 
 int
-BV_Overlap(PQP_REAL R[3][3], PQP_REAL T[3], BV *b1, BV *b2);
+BV_Overlap(Matrix& R, Vector& T, BV *b1, BV *b2);
 
 #if PQP_BV_TYPE & RSS_TYPE
 PQP_REAL
-BV_Distance(PQP_REAL R[3][3], PQP_REAL T[3], BV *b1, BV *b2);
+BV_Distance(Matrix& R, Vector& T, BV *b1, BV *b2);
 #endif
 
 #endif

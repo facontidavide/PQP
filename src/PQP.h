@@ -135,7 +135,7 @@ const int PQP_ERR_BUILD_EMPTY_MODEL = -5;
 //                                      // the parameter is optional, since
 //                                      // arrays are reallocated as needed
 //
-//    int AddTri(const PQP_REAL *p1, const PQP_REAL *p2, const PQP_REAL *p3, 
+//    int AddTri(const Vector& p1, const Vector& p2, const Vector& p3,
 //               int id);
 //
 //    int EndModel();
@@ -205,8 +205,8 @@ const int PQP_FIRST_CONTACT = 2; // report first intersecting tri pair found
 
 int 
 PQP_Collide(PQP_CollideResult *result,
-            PQP_REAL R1[3][3], PQP_REAL T1[3], PQP_Model *o1,
-            PQP_REAL R2[3][3], PQP_REAL T2[3], PQP_Model *o2,
+            Matrix& R1, Vector& T1, PQP_Model *o1,
+            Matrix& R2, Vector& T2, PQP_Model *o2,
             int flag = PQP_ALL_CONTACTS);
 
 
@@ -234,8 +234,8 @@ PQP_Collide(PQP_CollideResult *result,
 //    // specified.
 //
 //    PQP_REAL Distance();
-//    const PQP_REAL *P1();  // pointers to three PQP_REALs
-//    const PQP_REAL *P2();  
+//    const Vector& P1();  // pointers to three PQP_REALs
+//    const Vector& P2();
 //  };
 
 //----------------------------------------------------------------------------
@@ -266,8 +266,8 @@ PQP_Collide(PQP_CollideResult *result,
 
 int 
 PQP_Distance(PQP_DistanceResult *result, 
-             PQP_REAL R1[3][3], PQP_REAL T1[3], PQP_Model *o1,
-             PQP_REAL R2[3][3], PQP_REAL T2[3], PQP_Model *o2,
+             Matrix& R1, Vector& T1, PQP_Model *o1,
+             Matrix& R2, Vector& T2, PQP_Model *o2,
              PQP_REAL rel_err, PQP_REAL abs_err,
              int qsize = 2);
 
@@ -292,8 +292,8 @@ PQP_Distance(PQP_DistanceResult *result,
 //    // distance and point values are not meaningful.
 //  
 //    PQP_REAL Distance();
-//    const PQP_REAL *P1();
-//    const PQP_REAL *P2();
+//    const Vector& P1();
+//    const Vector& P2();
 //  
 //    // boolean says whether models are closer than tolerance distance
 //  
@@ -323,8 +323,8 @@ PQP_Distance(PQP_DistanceResult *result,
 
 int
 PQP_Tolerance(PQP_ToleranceResult *res, 
-              PQP_REAL R1[3][3], PQP_REAL T1[3], PQP_Model *o1,
-              PQP_REAL R2[3][3], PQP_REAL T2[3], PQP_Model *o2,
+              Matrix& R1, Vector& T1, PQP_Model *o1,
+              Matrix& R2, Vector& T2, PQP_Model *o2,
               PQP_REAL tolerance,
               int qsize = 2);
 

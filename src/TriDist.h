@@ -57,7 +57,7 @@
 // be expected.
 
 PQP_REAL 
-TriDist(PQP_REAL p[3], PQP_REAL q[3], 
-        const PQP_REAL s[3][3], const PQP_REAL t[3][3]);
+TriDist(Vector& p, Vector& q,
+        const Tri& s, const Tri& t);
 
 #endif

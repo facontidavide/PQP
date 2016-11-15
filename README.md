@@ -130,7 +130,7 @@ are contained in:
     
     // create some triangles
     PQP_REAL p1[3], p2[3], p3[3];  
-    PQP_REAL q1[3], q2[3], q3[3];
+    Vector q1, q2, q3;
     PQP_REAL r1[3], r2[3], r3[3];
     
     // initialize the points

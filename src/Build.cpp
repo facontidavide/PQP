@@ -70,9 +70,9 @@ void
 clear_accum(accum &a)
 {
   a.m[0] = a.m[1] = a.m[2] = 0.0;
-  a.s[0][0] = a.s[0][1] = a.s[0][2] = 0.0;
-  a.s[1][0] = a.s[1][1] = a.s[1][2] = 0.0;
-  a.s[2][0] = a.s[2][1] = a.s[2][2] = 0.0;
+  a.s(0,0) = a.s(0,1) = a.s(0,2) = 0.0;
+  a.s(1,0) = a.s(1,1) = a.s(1,2) = 0.0;
+  a.s(2,0) = a.s(2,1) = a.s(2,2) = 0.0;
   a.A = 0.0;
 }
 
@@ -84,15 +84,15 @@ accum_moment(accum &a, moment &b)
   a.m[1] += b.m[1] * b.A;
   a.m[2] += b.m[2] * b.A;
   
-  a.s[0][0] += b.s[0][0];
-  a.s[0][1] += b.s[0][1];
-  a.s[0][2] += b.s[0][2];
-  a.s[1][0] += b.s[1][0];
-  a.s[1][1] += b.s[1][1];
-  a.s[1][2] += b.s[1][2];
-  a.s[2][0] += b.s[2][0];
-  a.s[2][1] += b.s[2][1];
-  a.s[2][2] += b.s[2][2];
+  a.s(0,0) += b.s(0,0);
+  a.s(0,1) += b.s(0,1);
+  a.s(0,2) += b.s(0,2);
+  a.s(1,0) += b.s(1,0);
+  a.s(1,1) += b.s(1,1);
+  a.s(1,2) += b.s(1,2);
+  a.s(2,0) += b.s(2,0);
+  a.s(2,1) += b.s(2,1);
+  a.s(2,2) += b.s(2,2);
 
   a.A += b.A;
 }
@@ -150,15 +150,15 @@ compute_moment(moment &M, PQP_REAL p[3], PQP_REAL q[3], PQP_REAL r[3])
       M.m[2] = (p[2] + q[2] + r[2]) /3;
 
       // second-order components
-      M.s[0][0] = (p[0]*p[0] + q[0]*q[0] + r[0]*r[0]);
-      M.s[0][1] = (p[0]*p[1] + q[0]*q[1] + r[0]*r[1]);
-      M.s[0][2] = (p[0]*p[2] + q[0]*q[2] + r[0]*r[2]);
-      M.s[1][1] = (p[1]*p[1] + q[1]*q[1] + r[1]*r[1]);
-      M.s[1][2] = (p[1]*p[2] + q[1]*q[2] + r[1]*r[2]);
-      M.s[2][2] = (p[2]*p[2] + q[2]*q[2] + r[2]*r[2]);      
-      M.s[2][1] = M.s[1][2];
-      M.s[1][0] = M.s[0][1];
-      M.s[2][0] = M.s[0][2];
+      M.s(0,0) = (p[0]*p[0] + q[0]*q[0] + r[0]*r[0]);
+      M.s(0,1) = (p[0]*p[1] + q[0]*q[1] + r[0]*r[1]);
+      M.s(0,2) = (p[0]*p[2] + q[0]*q[2] + r[0]*r[2]);
+      M.s(1,1) = (p[1]*p[1] + q[1]*q[1] + r[1]*r[1]);
+      M.s(1,2) = (p[1]*p[2] + q[1]*q[2] + r[1]*r[2]);
+      M.s(2,2) = (p[2]*p[2] + q[2]*q[2] + r[2]*r[2]);      
+      M.s(2,1) = M.s(1,2);
+      M.s(1,0) = M.s(0,1);
+      M.s(2,0) = M.s(0,2);
 
       return;
     }
@@ -169,15 +169,15 @@ compute_moment(moment &M, PQP_REAL p[3], PQP_REAL q[3], PQP_REAL r[3])
   M.m[2] = (p[2] + q[2] + r[2])/3;
 
   // get the second order components -- note the weighting by the area
-  M.s[0][0] = M.A*(9*M.m[0]*M.m[0]+p[0]*p[0]+q[0]*q[0]+r[0]*r[0])/12;
-  M.s[0][1] = M.A*(9*M.m[0]*M.m[1]+p[0]*p[1]+q[0]*q[1]+r[0]*r[1])/12;
-  M.s[1][1] = M.A*(9*M.m[1]*M.m[1]+p[1]*p[1]+q[1]*q[1]+r[1]*r[1])/12;
-  M.s[0][2] = M.A*(9*M.m[0]*M.m[2]+p[0]*p[2]+q[0]*q[2]+r[0]*r[2])/12;
-  M.s[1][2] = M.A*(9*M.m[1]*M.m[2]+p[1]*p[2]+q[1]*q[2]+r[1]*r[2])/12;
-  M.s[2][2] = M.A*(9*M.m[2]*M.m[2]+p[2]*p[2]+q[2]*q[2]+r[2]*r[2])/12;
-  M.s[2][1] = M.s[1][2];
-  M.s[1][0] = M.s[0][1];
-  M.s[2][0] = M.s[0][2];
+  M.s(0,0) = M.A*(9*M.m[0]*M.m[0]+p[0]*p[0]+q[0]*q[0]+r[0]*r[0])/12;
+  M.s(0,1) = M.A*(9*M.m[0]*M.m[1]+p[0]*p[1]+q[0]*q[1]+r[0]*r[1])/12;
+  M.s(1,1) = M.A*(9*M.m[1]*M.m[1]+p[1]*p[1]+q[1]*q[1]+r[1]*r[1])/12;
+  M.s(0,2) = M.A*(9*M.m[0]*M.m[2]+p[0]*p[2]+q[0]*q[2]+r[0]*r[2])/12;
+  M.s(1,2) = M.A*(9*M.m[1]*M.m[2]+p[1]*p[2]+q[1]*q[2]+r[1]*r[2])/12;
+  M.s(2,2) = M.A*(9*M.m[2]*M.m[2]+p[2]*p[2]+q[2]*q[2]+r[2]*r[2])/12;
+  M.s(2,1) = M.s(1,2);
+  M.s(1,0) = M.s(0,1);
+  M.s(2,0) = M.s(0,2);
 }
 
 inline
@@ -250,18 +250,18 @@ PQP_REAL min(PQP_REAL a, PQP_REAL b, PQP_REAL c, PQP_REAL d)
 }
 
 void
-get_centroid_triverts(PQP_REAL c[3], Tri *tris, int num_tris)
+get_centroid_triverts(Vector& c, Tri *tris, int num_tris)
 {
   int i;
 
-  c[0] = c[1] = c[2] = 0.0;
+  c.setZero();
 
   // get center of mass
   for(i=0; i<num_tris; i++)
   {
-    PQP_REAL *p1 = tris[i].p1;
-    PQP_REAL *p2 = tris[i].p2;
-    PQP_REAL *p3 = tris[i].p3;
+    Vector& p1 = tris[i].p1;
+    Vector& p2 = tris[i].p2;
+    Vector& p3 = tris[i].p3;
 
     c[0] += p1[0] + p2[0] + p3[0];
     c[1] += p1[1] + p2[1] + p3[1];
@@ -276,44 +276,44 @@ get_centroid_triverts(PQP_REAL c[3], Tri *tris, int num_tris)
 }
 
 void
-get_covariance_triverts(PQP_REAL M[3][3], Tri *tris, int num_tris)
+get_covariance_triverts(Matrix& M, Tri *tris, int num_tris)
 {
   int i;
-  PQP_REAL S1[3];
-  PQP_REAL S2[3][3];
+  Vector S1;
+  Matrix S2;
 
   S1[0] = S1[1] = S1[2] = 0.0;
-  S2[0][0] = S2[1][0] = S2[2][0] = 0.0;
-  S2[0][1] = S2[1][1] = S2[2][1] = 0.0;
-  S2[0][2] = S2[1][2] = S2[2][2] = 0.0;
+  S2(0,0) = S2(1,0) = S2(2,0) = 0.0;
+  S2(0,1) = S2(1,1) = S2(2,1) = 0.0;
+  S2(0,2) = S2(1,2) = S2(2,2) = 0.0;
 
   // get center of mass
   for(i=0; i<num_tris; i++)
   {
-    PQP_REAL *p1 = tris[i].p1;
-    PQP_REAL *p2 = tris[i].p2;
-    PQP_REAL *p3 = tris[i].p3;
+    Vector& p1 = tris[i].p1;
+    Vector& p2 = tris[i].p2;
+    Vector& p3 = tris[i].p3;
 
     S1[0] += p1[0] + p2[0] + p3[0];
     S1[1] += p1[1] + p2[1] + p3[1];
     S1[2] += p1[2] + p2[2] + p3[2];
 
-    S2[0][0] += (p1[0] * p1[0] +  
+    S2(0,0) += (p1[0] * p1[0] +  
                  p2[0] * p2[0] +  
                  p3[0] * p3[0]);
-    S2[1][1] += (p1[1] * p1[1] +  
+    S2(1,1) += (p1[1] * p1[1] +  
                  p2[1] * p2[1] +  
                  p3[1] * p3[1]);
-    S2[2][2] += (p1[2] * p1[2] +  
+    S2(2,2) += (p1[2] * p1[2] +  
                  p2[2] * p2[2] +  
                  p3[2] * p3[2]);
-    S2[0][1] += (p1[0] * p1[1] +  
+    S2(0,1) += (p1[0] * p1[1] +  
                  p2[0] * p2[1] +  
                  p3[0] * p3[1]);
-    S2[0][2] += (p1[0] * p1[2] +  
+    S2(0,2) += (p1[0] * p1[2] +  
                  p2[0] * p2[2] +  
                  p3[0] * p3[2]);
-    S2[1][2] += (p1[1] * p1[2] +  
+    S2(1,2) += (p1[1] * p1[2] +  
                  p2[1] * p2[2] +  
                  p3[1] * p3[2]);
   }
@@ -322,15 +322,15 @@ get_covariance_triverts(PQP_REAL M[3][3], Tri *tris, int num_tris)
 
   // now get covariances
 
-  M[0][0] = S2[0][0] - S1[0]*S1[0] / n;
-  M[1][1] = S2[1][1] - S1[1]*S1[1] / n;
-  M[2][2] = S2[2][2] - S1[2]*S1[2] / n;
-  M[0][1] = S2[0][1] - S1[0]*S1[1] / n;
-  M[1][2] = S2[1][2] - S1[1]*S1[2] / n;
-  M[0][2] = S2[0][2] - S1[0]*S1[2] / n;
-  M[1][0] = M[0][1];
-  M[2][0] = M[0][2];
-  M[2][1] = M[1][2];
+  M(0,0) = S2(0,0) - S1[0]*S1[0] / n;
+  M(1,1) = S2(1,1) - S1[1]*S1[1] / n;
+  M(2,2) = S2(2,2) - S1[2]*S1[2] / n;
+  M(0,1) = S2(0,1) - S1[0]*S1[1] / n;
+  M(1,2) = S2(1,2) - S1[1]*S1[2] / n;
+  M(0,2) = S2(0,2) - S1[0]*S1[2] / n;
+  M(1,0) = M(0,1);
+  M(2,0) = M(0,2);
+  M(2,1) = M(1,2);
 }
 
 #endif
@@ -341,11 +341,11 @@ get_covariance_triverts(PQP_REAL M[3][3], Tri *tris, int num_tris)
 // Returns the number of tris in the first half
 
 int 
-split_tris(Tri *tris, int num_tris, PQP_REAL a[3], PQP_REAL c)
+split_tris(Tri *tris, int num_tris, Vector& a, PQP_REAL c)
 {
   int i;
   int c1 = 0;
-  PQP_REAL p[3];
+  Vector p;
   PQP_REAL x;
   Tri temp;
 
@@ -394,7 +394,9 @@ build_recurse(PQP_Model *m, int bn, int first_tri, int num_tris)
 
   // compute a rotation matrix
 
-  PQP_REAL C[3][3], E[3][3], R[3][3], s[3], axis[3], mean[3], coord;
+  Matrix C, E, R;
+  Vector s, axis, mean;
+  PQP_REAL coord;
 
 #if RAPID2_FIT
   moment *tri_moment = new moment[num_tris];
@@ -420,9 +422,9 @@ build_recurse(PQP_Model *m, int bn, int first_tri, int num_tris)
   else { mid = 2; }
   McolcMcol(R,0,E,max);
   McolcMcol(R,1,E,mid);
-  R[0][2] = E[1][max]*E[2][mid] - E[1][mid]*E[2][max];
-  R[1][2] = E[0][mid]*E[2][max] - E[0][max]*E[2][mid];
-  R[2][2] = E[0][max]*E[1][mid] - E[0][mid]*E[1][max];
+  R(0,2) = E(1,max)*E(2,mid) - E(1,mid)*E(2,max);
+  R(1,2) = E(0,mid)*E(2,max) - E(0,max)*E(2,mid);
+  R(2,2) = E(0,max)*E(1,mid) - E(0,mid)*E(1,max);
 
   // fit the BV
 
@@ -471,16 +473,16 @@ build_recurse(PQP_Model *m, int bn, int first_tri, int num_tris)
 
 void 
 make_parent_relative(PQP_Model *m, int bn,
-                     const PQP_REAL parentR[3][3]
+                     const Matrix& parentR
 #if PQP_BV_TYPE & RSS_TYPE
-                     ,const PQP_REAL parentTr[3]
+                     ,const Vector& parentTr
 #endif
 #if PQP_BV_TYPE & OBB_TYPE
-                     ,const PQP_REAL parentTo[3]
+                     ,const Vector& parentTo
 #endif
                     )
 {
-  PQP_REAL Rpc[3][3], Tpc[3];
+  Matrix Rpc; Vector Tpc;
 
   if (!m->child(bn)->Leaf())
   {
@@ -534,7 +536,7 @@ build_model(PQP_Model *m)
 
   // change BV orientations from world-relative to parent-relative
 
-  PQP_REAL R[3][3],T[3];
+  Matrix R; Vector T;
   Midentity(R);
   Videntity(T);
 

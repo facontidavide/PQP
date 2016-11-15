@@ -45,9 +45,25 @@
 
 struct Tri
 {
-  PQP_REAL p1[3];
-  PQP_REAL p2[3];
-  PQP_REAL p3[3];
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+  Vector p[3];
+  Vector& p1;
+  Vector& p2;
+  Vector& p3;
+
+  Tri():p1(p[0]), p2(p[1]), p3(p[2]) {}
+
+  Vector& operator[](size_t i) { return p[i];}
+
+  const Vector& operator[](size_t i) const { return p[i];}
+
+  Tri& operator = (const Tri& other){
+      p[0] = other.p1;
+      p[1] = other.p2;
+      p[2] = other.p3;
+  }
+
   int id;
 };
 

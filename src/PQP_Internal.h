@@ -66,7 +66,7 @@ public:
   int BeginModel(int num_tris = 8); // preallocate for num_tris triangles;
                                     // the parameter is optional, since
                                     // arrays are reallocated as needed
-  int AddTri(const PQP_REAL *p1, const PQP_REAL *p2, const PQP_REAL *p3, 
+  int AddTri(const Vector& p1, const Vector& p2, const Vector& p3,
              int id);
   int EndModel();
   int MemUsage(int msg);  // returns model mem usage.  
@@ -81,6 +81,7 @@ struct CollisionPair
 
 struct PQP_CollideResult  
 {
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   // stats
 
   int num_bv_tests;
@@ -89,8 +90,8 @@ struct PQP_CollideResult
 
   // xform from model 1 to model 2
 
-  PQP_REAL R[3][3];
-  PQP_REAL T[3];
+  Matrix R;
+  Vector T;
 
   int num_pairs_alloced;
   int num_pairs;
@@ -125,6 +126,7 @@ struct PQP_CollideResult
 
 struct PQP_DistanceResult 
 {
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   // stats
 
   int num_bv_tests;
@@ -133,15 +135,15 @@ struct PQP_DistanceResult
 
   // xform from model 1 to model 2
 
-  PQP_REAL R[3][3];
-  PQP_REAL T[3];
+  Matrix R;
+  Vector T;
 
   PQP_REAL rel_err; 
   PQP_REAL abs_err; 
 
   PQP_REAL distance;
-  PQP_REAL p1[3]; 
-  PQP_REAL p2[3];
+  Vector p1;
+  Vector p2;
   int qsize;
   
   // statistics
@@ -156,12 +158,13 @@ struct PQP_DistanceResult
   // Points are defined: PQP_REAL p1[3], p2[3];
 
   PQP_REAL Distance() { return distance; }
-  const PQP_REAL *P1() { return p1; }
-  const PQP_REAL *P2() { return p2; }
+  const Vector& P1() { return p1; }
+  const Vector& P2() { return p2; }
 };
 
 struct PQP_ToleranceResult 
 {
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   // stats
 
   int num_bv_tests;
@@ -170,15 +173,15 @@ struct PQP_ToleranceResult
 
   // xform from model 1 to model 2
 
-  PQP_REAL R[3][3];
-  PQP_REAL T[3];
+  Matrix R;
+  Vector T;
 
   int    closer_than_tolerance;   
   PQP_REAL tolerance;      
 
   PQP_REAL distance;
-  PQP_REAL p1[3]; 
-  PQP_REAL p2[3]; 
+  Vector p1;
+  Vector p2;
   int qsize;
 
   // statistics
@@ -192,8 +195,8 @@ struct PQP_ToleranceResult
   // distance and point values are not meaningful.
 
   PQP_REAL Distance() { return distance; }
-  const PQP_REAL *P1() { return p1; }
-  const PQP_REAL *P2() { return p2; }
+  const Vector& P1() { return p1; }
+  const Vector& P2() { return p2; }
 
   // boolean says whether models are closer than tolerance distance
 

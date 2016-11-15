@@ -123,9 +123,9 @@ PQP_Model::BeginModel(int n)
 }
 
 int
-PQP_Model::AddTri(const PQP_REAL *p1, 
-                  const PQP_REAL *p2, 
-                  const PQP_REAL *p3, 
+PQP_Model::AddTri(const Vector& p1,
+                  const Vector& p2,
+                  const Vector& p3,
                   int id)
 {
   if (build_state == PQP_BUILD_STATE_EMPTY)
@@ -347,9 +347,9 @@ min(PQP_REAL a, PQP_REAL b, PQP_REAL c)
 }
 
 int
-project6(PQP_REAL *ax, 
-         PQP_REAL *p1, PQP_REAL *p2, PQP_REAL *p3, 
-         PQP_REAL *q1, PQP_REAL *q2, PQP_REAL *q3)
+project6(Vector& ax,
+         Vector& p1, Vector& p2, Vector& p3,
+         Vector& q1, Vector& q2, Vector& q3)
 {
   PQP_REAL P1 = VdotV(ax, p1);
   PQP_REAL P2 = VdotV(ax, p2);
@@ -372,8 +372,8 @@ project6(PQP_REAL *ax,
 // uses no divisions
 // works on coplanar triangles
 int 
-TriContact(PQP_REAL *P1, PQP_REAL *P2, PQP_REAL *P3,
-           PQP_REAL *Q1, PQP_REAL *Q2, PQP_REAL *Q3) 
+TriContact(Vector& P1, Vector& P2, Vector& P3,
+           Vector& Q1, Vector& Q2, Vector& Q3)
 {
 
   // One triangle is (p1,p2,p3).  Other is (q1,q2,q3).
@@ -385,17 +385,17 @@ TriContact(PQP_REAL *P1, PQP_REAL *P2, PQP_REAL *P3,
   //
   // First thing we do is establish a new c.s. so that p1 is at (0,0,0).
 
-  PQP_REAL p1[3], p2[3], p3[3];
-  PQP_REAL q1[3], q2[3], q3[3];
-  PQP_REAL e1[3], e2[3], e3[3];
-  PQP_REAL f1[3], f2[3], f3[3];
-  PQP_REAL g1[3], g2[3], g3[3];
-  PQP_REAL h1[3], h2[3], h3[3];
-  PQP_REAL n1[3], m1[3];
+  Vector p1, p2, p3;
+  Vector q1, q2, q3;
+  Vector e1, e2, e3;
+  Vector f1, f2, f3;
+  Vector g1, g2, g3;
+  Vector h1, h2, h3;
+  Vector n1, m1;
 
-  PQP_REAL ef11[3], ef12[3], ef13[3];
-  PQP_REAL ef21[3], ef22[3], ef23[3];
-  PQP_REAL ef31[3], ef32[3], ef33[3];
+  Vector ef11, ef12, ef13;
+  Vector ef21, ef22, ef23;
+  Vector ef31, ef32, ef33;
   
   p1[0] = P1[0] - P1[0];  p1[1] = P1[1] - P1[1];  p1[2] = P1[2] - P1[2];
   p2[0] = P2[0] - P1[0];  p2[1] = P2[1] - P1[1];  p2[2] = P2[2] - P1[2];
@@ -460,27 +460,24 @@ TriContact(PQP_REAL *P1, PQP_REAL *P2, PQP_REAL *P3,
 
 inline
 PQP_REAL
-TriDistance(PQP_REAL R[3][3], PQP_REAL T[3], Tri *t1, Tri *t2,
-            PQP_REAL p[3], PQP_REAL q[3])
+TriDistance(Matrix& R, Vector& T, Tri *t1, Tri *t2,
+            Vector& p, Vector& q)
 {
   // transform tri 2 into same space as tri 1
 
-  PQP_REAL tri1[3][3], tri2[3][3];
+  Tri tri2;
 
-  VcV(tri1[0], t1->p1);
-  VcV(tri1[1], t1->p2);
-  VcV(tri1[2], t1->p3);
   MxVpV(tri2[0], R, t2->p1, T);
   MxVpV(tri2[1], R, t2->p2, T);
   MxVpV(tri2[2], R, t2->p3, T);
                                 
-  return TriDist(p,q,tri1,tri2);
+  return TriDist(p,q, *t1, tri2);
 }
 
 
 void
 CollideRecurse(PQP_CollideResult *res,
-               PQP_REAL R[3][3], PQP_REAL T[3], // b2 relative to b1
+               Matrix& R, Vector& T, // b2 relative to b1
                PQP_Model *o1, int b1, 
                PQP_Model *o2, int b2, int flag)
 {
@@ -504,10 +501,10 @@ CollideRecurse(PQP_CollideResult *res,
 
     Tri *t1 = &o1->tris[-o1->child(b1)->first_child - 1];
     Tri *t2 = &o2->tris[-o2->child(b2)->first_child - 1];
-    PQP_REAL q1[3], q2[3], q3[3];
-    PQP_REAL *p1 = t1->p1;
-    PQP_REAL *p2 = t1->p2;
-    PQP_REAL *p3 = t1->p3;    
+    Vector q1, q2, q3;
+    Vector& p1 = t1->p1;
+    Vector& p2 = t1->p2;
+    Vector& p3 = t1->p3;
     MxVpV(q1, res->R, t2->p1, res->T);
     MxVpV(q2, res->R, t2->p2, res->T);
     MxVpV(q3, res->R, t2->p3, res->T);
@@ -518,7 +515,7 @@ CollideRecurse(PQP_CollideResult *res,
       res->Add(t1->id, t2->id);
     }
 #else
-    PQP_REAL p[3], q[3];
+    Vector p, q;
 
     Tri *t1 = &o1->tris[-o1->child(b1)->first_child - 1];
     Tri *t2 = &o2->tris[-o2->child(b2)->first_child - 1];
@@ -539,7 +536,8 @@ CollideRecurse(PQP_CollideResult *res,
   PQP_REAL sz1 = o1->child(b1)->GetSize();
   PQP_REAL sz2 = o2->child(b2)->GetSize();
 
-  PQP_REAL Rc[3][3],Tc[3],Ttemp[3];
+  Matrix Rc;
+  Vector Tc,Ttemp;
     
   if (l2 || (!l1 && (sz1 > sz2)))
   {
@@ -593,8 +591,8 @@ CollideRecurse(PQP_CollideResult *res,
 
 int 
 PQP_Collide(PQP_CollideResult *res,
-            PQP_REAL R1[3][3], PQP_REAL T1[3], PQP_Model *o1,
-            PQP_REAL R2[3][3], PQP_REAL T2[3], PQP_Model *o2,
+            Matrix &R1, Vector &T1, PQP_Model *o1,
+            Matrix &R2, Vector &T2, PQP_Model *o2,
             int flag)
 {
   double t1 = GetTime();
@@ -620,13 +618,13 @@ PQP_Collide(PQP_CollideResult *res,
   // First compute the rotation part, then translation part
 
   MTxM(res->R,R1,R2);
-  PQP_REAL Ttemp[3];
+  Vector Ttemp;
   VmV(Ttemp, T2, T1);  
   MTxV(res->T, R1, Ttemp);
   
   // compute the transform from o1->child(0) to o2->child(0)
 
-  PQP_REAL Rtemp[3][3], R[3][3], T[3];
+  Matrix Rtemp, R; Vector T;
 
   MxM(Rtemp,res->R,o2->child(0)->R);
   MTxM(R,o1->child(0)->R,Rtemp);
@@ -661,7 +659,7 @@ PQP_Collide(PQP_CollideResult *res,
 
 void
 DistanceRecurse(PQP_DistanceResult *res,
-                PQP_REAL R[3][3], PQP_REAL T[3], // b2 relative to b1
+                Matrix& R, Vector& T, // b2 relative to b1
                 PQP_Model *o1, int b1,
                 PQP_Model *o2, int b2)
 {
@@ -676,7 +674,7 @@ DistanceRecurse(PQP_DistanceResult *res,
 
     res->num_tri_tests++;
 
-    PQP_REAL p[3], q[3];
+    Vector p, q;
 
     Tri *t1 = &o1->tris[-o1->child(b1)->first_child - 1];
     Tri *t2 = &o2->tris[-o2->child(b2)->first_child - 1];
@@ -702,7 +700,8 @@ DistanceRecurse(PQP_DistanceResult *res,
   // pair second.
 
   int a1,a2,c1,c2;  // new bv tests 'a' and 'c'
-  PQP_REAL R1[3][3], T1[3], R2[3][3], T2[3], Ttemp[3];
+  Matrix R1, R2;
+  Vector T1,T2, Ttemp;
 
   if (l2 || (!l1 && (sz1 > sz2)))
   {
@@ -790,7 +789,7 @@ DistanceRecurse(PQP_DistanceResult *res,
 
 void
 DistanceQueueRecurse(PQP_DistanceResult *res, 
-                     PQP_REAL R[3][3], PQP_REAL T[3],
+                     Matrix& R, Vector& T,
                      PQP_Model *o1, int b1,
                      PQP_Model *o2, int b2)
 {
@@ -813,7 +812,7 @@ DistanceQueueRecurse(PQP_DistanceResult *res,
 
       res->num_tri_tests++;
 
-      PQP_REAL p[3], q[3];
+      Vector p, q;
 
       Tri *t1 = &o1->tris[-o1->child(min_test.b1)->first_child - 1];
       Tri *t2 = &o2->tris[-o2->child(min_test.b2)->first_child - 1];
@@ -848,7 +847,7 @@ DistanceQueueRecurse(PQP_DistanceResult *res,
       res->num_bv_tests += 2;
  
       BVT bvt1,bvt2;
-      PQP_REAL Ttemp[3];
+      Vector Ttemp;
 
       if (l2 || (!l1 && (sz1 > sz2)))	
       {  
@@ -944,8 +943,8 @@ DistanceQueueRecurse(PQP_DistanceResult *res,
 
 int 
 PQP_Distance(PQP_DistanceResult *res,
-             PQP_REAL R1[3][3], PQP_REAL T1[3], PQP_Model *o1,
-             PQP_REAL R2[3][3], PQP_REAL T2[3], PQP_Model *o2,
+             Matrix &R1, Vector &T1, PQP_Model *o1,
+             Matrix &R2, Vector &T2, PQP_Model *o2,
              PQP_REAL rel_err, PQP_REAL abs_err,
              int qsize)
 {
@@ -964,14 +963,14 @@ PQP_Distance(PQP_DistanceResult *res,
   // First compute the rotation part, then translation part
 
   MTxM(res->R,R1,R2);
-  PQP_REAL Ttemp[3];
+  Vector Ttemp;
   VmV(Ttemp, T2, T1);  
   MTxV(res->T, R1, Ttemp);
   
   // establish initial upper bound using last triangles which 
   // provided the minimum distance
 
-  PQP_REAL p[3],q[3];
+  Vector p,q;
   res->distance = TriDistance(res->R,res->T,o1->last_tri,o2->last_tri,p,q);
   VcV(res->p1,p);
   VcV(res->p2,q);
@@ -988,7 +987,7 @@ PQP_Distance(PQP_DistanceResult *res,
   
   // compute the transform from o1->child(0) to o2->child(0)
 
-  PQP_REAL Rtemp[3][3], R[3][3], T[3];
+  Matrix Rtemp, R; Vector T;
 
   MxM(Rtemp,res->R,o2->child(0)->R);
   MTxM(R,o1->child(0)->R,Rtemp);
@@ -1017,7 +1016,7 @@ PQP_Distance(PQP_DistanceResult *res,
 
   // res->p2 is in cs 1 ; transform it to cs 2
 
-  PQP_REAL u[3];
+  Vector u;
   VmV(u, res->p2, res->T);
   MTxV(res->p2, res->R, u);
 
@@ -1032,7 +1031,7 @@ PQP_Distance(PQP_DistanceResult *res,
 //---------------------------------------------------------------------------
 void 
 ToleranceRecurse(PQP_ToleranceResult *res, 
-                 PQP_REAL R[3][3], PQP_REAL T[3],
+                 Matrix& R, Vector& T,
                  PQP_Model *o1, int b1, PQP_Model *o2, int b2)
 {
   PQP_REAL sz1 = o1->child(b1)->GetSize();
@@ -1046,7 +1045,7 @@ ToleranceRecurse(PQP_ToleranceResult *res,
     
     res->num_tri_tests++;
 
-    PQP_REAL p[3], q[3];
+    Vector p, q;
 
     Tri *t1 = &o1->tris[-o1->child(b1)->first_child - 1];
     Tri *t2 = &o2->tris[-o2->child(b2)->first_child - 1];
@@ -1068,7 +1067,8 @@ ToleranceRecurse(PQP_ToleranceResult *res,
   }
 
   int a1,a2,c1,c2;  // new bv tests 'a' and 'c'
-  PQP_REAL R1[3][3], T1[3], R2[3][3], T2[3], Ttemp[3];
+  Matrix R1, R2;
+  Vector T1, T2, Ttemp;
 
   if (l2 || (!l1 && (sz1 > sz2)))
   {
@@ -1139,7 +1139,7 @@ ToleranceRecurse(PQP_ToleranceResult *res,
 
 void
 ToleranceQueueRecurse(PQP_ToleranceResult *res,
-                      PQP_REAL R[3][3], PQP_REAL T[3],
+                      Matrix& R, Vector& T,
                       PQP_Model *o1, int b1,
                       PQP_Model *o2, int b2)
 {
@@ -1161,7 +1161,7 @@ ToleranceQueueRecurse(PQP_ToleranceResult *res,
     
       res->num_tri_tests++;
 
-      PQP_REAL p[3], q[3];
+      Vector p, q;
 
       Tri *t1 = &o1->tris[-o1->child(min_test.b1)->first_child - 1];
       Tri *t2 = &o2->tris[-o2->child(min_test.b2)->first_child - 1];
@@ -1198,7 +1198,7 @@ ToleranceQueueRecurse(PQP_ToleranceResult *res,
       res->num_bv_tests += 2;
       
       BVT bvt1,bvt2;
-      PQP_REAL Ttemp[3];
+      Vector Ttemp;
 
       if (l2 || (!l1 && (sz1 > sz2)))	
       {
@@ -1291,8 +1291,8 @@ ToleranceQueueRecurse(PQP_ToleranceResult *res,
 
 int
 PQP_Tolerance(PQP_ToleranceResult *res,
-              PQP_REAL R1[3][3], PQP_REAL T1[3], PQP_Model *o1,
-              PQP_REAL R2[3][3], PQP_REAL T2[3], PQP_Model *o2,
+              Matrix& R1, Vector& T1, PQP_Model *o1,
+              Matrix& R2, Vector& T2, PQP_Model *o2,
               PQP_REAL tolerance,
               int qsize)
 {
@@ -1309,7 +1309,7 @@ PQP_Tolerance(PQP_ToleranceResult *res,
   // [R,T] = [R1,T1]'[R2,T2] = [R1',-R1'T][R2,T2] = [R1'R2, R1'(T2-T1)]
 
   MTxM(res->R,R1,R2);
-  PQP_REAL Ttemp[3];
+  Vector Ttemp;
   VmV(Ttemp, T2, T1);
   MTxV(res->T, R1, Ttemp);
 
@@ -1329,7 +1329,8 @@ PQP_Tolerance(PQP_ToleranceResult *res,
   
   // compute the transform from o1->child(0) to o2->child(0)
 
-  PQP_REAL Rtemp[3][3], R[3][3], T[3];
+  Matrix Rtemp, R;
+  Vector T;
 
   MxM(Rtemp,res->R,o2->child(0)->R);
   MTxM(R,o1->child(0)->R,Rtemp);
@@ -1363,7 +1364,7 @@ PQP_Tolerance(PQP_ToleranceResult *res,
 
   // res->p2 is in cs 1 ; transform it to cs 2
 
-  PQP_REAL u[3];
+  Vector u;
   VmV(u, res->p2, res->T);
   MTxV(res->p2, res->R, u);
 
