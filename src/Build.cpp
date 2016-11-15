@@ -294,9 +294,7 @@ get_covariance_triverts(Matrix& M, Tri *tris, int num_tris)
     Vector& p2 = tris[i].p2;
     Vector& p3 = tris[i].p3;
 
-    S1[0] += p1[0] + p2[0] + p3[0];
-    S1[1] += p1[1] + p2[1] + p3[1];
-    S1[2] += p1[2] + p2[2] + p3[2];
+    S1 += p1 + p2 + p3;
 
     S2(0,0) += (p1[0] * p1[0] +  
                  p2[0] * p2[0] +  
@@ -532,7 +530,7 @@ build_model(PQP_Model *m)
 
   // build recursively
 
-  build_recurse(m, 0, 0, m->num_tris);
+  build_recurse(m, 0, 0, m->tris.size());
 
   // change BV orientations from world-relative to parent-relative
 

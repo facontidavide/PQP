@@ -58,16 +58,11 @@ PQP_Model::PQP_Model()
 {
   // no bounding volume tree yet
 
-  b = 0;  
+  b = 0;
   num_bvs_alloced = 0;
   num_bvs = 0;
 
   // no tri list yet
-
-  tris = 0;
-  num_tris = 0;
-  num_tris_alloced = 0;
-
   last_tri = 0;
 
   build_state = PQP_BUILD_STATE_EMPTY;
@@ -77,8 +72,6 @@ PQP_Model::~PQP_Model()
 {
   if (b != NULL)
     delete [] b;
-  if (tris != NULL)
-    delete [] tris;
 }
 
 int
@@ -89,22 +82,15 @@ PQP_Model::BeginModel(int n)
   if (build_state != PQP_BUILD_STATE_EMPTY) 
   {
     delete [] b;
-    delete [] tris;
-  
-    num_tris = num_bvs = num_tris_alloced = num_bvs_alloced = 0;
+    num_bvs = num_bvs_alloced = 0;
+    tris.clear();
   }
 
   // prepare model for addition of triangles
 
   if (n <= 0) n = 8;
-  num_tris_alloced = n;
-  tris = new Tri[n];
-  if (!tris) 
-  {
-    fprintf(stderr, "PQP Error!  Out of memory for tri array on "
-                    "BeginModel() call!\n");
-    return PQP_ERR_MODEL_OUT_OF_MEMORY;  
-  }
+
+  tris.reserve(n);
 
   // give a warning if called out of sequence
 
@@ -141,41 +127,23 @@ PQP_Model::AddTri(const Vector& p1,
     return PQP_ERR_BUILD_OUT_OF_SEQUENCE;
   }
         
-  // allocate for new triangles
-
-  if (num_tris >= num_tris_alloced)
-  {
-    Tri *temp;
-    temp = new Tri[num_tris_alloced*2];
-    if (!temp)
-    {
-      fprintf(stderr, "PQP Error!  Out of memory for tri array on"
-	              " AddTri() call!\n");
-      return PQP_ERR_MODEL_OUT_OF_MEMORY;  
-    }
-    memcpy(temp, tris, sizeof(Tri)*num_tris);
-    delete [] tris;
-    tris = temp;
-    num_tris_alloced = num_tris_alloced*2;
-  }
-  
   // initialize the new triangle
+  Tri tr;
+  tr.p1[0] = p1[0];
+  tr.p1[1] = p1[1];
+  tr.p1[2] = p1[2];
 
-  tris[num_tris].p1[0] = p1[0];
-  tris[num_tris].p1[1] = p1[1];
-  tris[num_tris].p1[2] = p1[2];
+  tr.p2[0] = p2[0];
+  tr.p2[1] = p2[1];
+  tr.p2[2] = p2[2];
 
-  tris[num_tris].p2[0] = p2[0];
-  tris[num_tris].p2[1] = p2[1];
-  tris[num_tris].p2[2] = p2[2];
+  tr.p3[0] = p3[0];
+  tr.p3[1] = p3[1];
+  tr.p3[2] = p3[2];
 
-  tris[num_tris].p3[0] = p3[0];
-  tris[num_tris].p3[1] = p3[1];
-  tris[num_tris].p3[2] = p3[2];
+  tr.id = id;
 
-  tris[num_tris].id = id;
-
-  num_tris += 1;
+  tris.push_back( tr );
 
   return PQP_OK;
 }
@@ -194,40 +162,23 @@ PQP_Model::EndModel()
 
   // report error is no tris
 
-  if (num_tris == 0)
+  if (tris.size() == 0)
   {
     fprintf(stderr,"PQP Error! EndModel() called on model with"
                    " no triangles\n");
     return PQP_ERR_BUILD_EMPTY_MODEL;
   }
 
-  // shrink fit tris array 
-
-  if (num_tris_alloced > num_tris)
-  {
-    Tri *new_tris = new Tri[num_tris];
-    if (!new_tris) 
-    {
-      fprintf(stderr, "PQP Error!  Out of memory for tri array "
-                      "in EndModel() call!\n");
-      return PQP_ERR_MODEL_OUT_OF_MEMORY;  
-    }
-    memcpy(new_tris, tris, sizeof(Tri)*num_tris);
-    delete [] tris;
-    tris = new_tris;
-    num_tris_alloced = num_tris;
-  }
-
   // create an array of BVs for the model
 
-  b = new BV[2*num_tris - 1];
+  b = new BV[2*tris.size() - 1];
   if (!b)
   {
     fprintf(stderr,"PQP Error! out of memory for BV array "
                    "in EndModel()\n");
     return PQP_ERR_MODEL_OUT_OF_MEMORY;
   }
-  num_bvs_alloced = 2*num_tris - 1;
+  num_bvs_alloced = 2*tris.size() - 1;
   num_bvs = 0;
 
   // we should build the model now.
@@ -235,7 +186,7 @@ PQP_Model::EndModel()
   build_model(this);
   build_state = PQP_BUILD_STATE_PROCESSED;
 
-  last_tri = tris;
+  last_tri = &tris[0];
 
   return PQP_OK;
 }
@@ -244,7 +195,7 @@ int
 PQP_Model::MemUsage(int msg)
 {
   int mem_bv_list = sizeof(BV)*num_bvs;
-  int mem_tri_list = sizeof(Tri)*num_tris;
+  int mem_tri_list = sizeof(Tri)*tris.size();
 
   int total_mem = mem_bv_list + mem_tri_list + sizeof(PQP_Model);
 
@@ -254,7 +205,7 @@ PQP_Model::MemUsage(int msg)
     fprintf(stderr,"BVs: %d alloced, take %d bytes each\n", 
             num_bvs, sizeof(BV));
     fprintf(stderr,"Tris: %d alloced, take %d bytes each\n", 
-            num_tris, sizeof(Tri));
+            tris.size(), sizeof(Tri));
   }
   
   return total_mem;
@@ -511,7 +462,6 @@ CollideRecurse(PQP_CollideResult *res,
     if (TriContact(p1, p2, p3, q1, q2, q3)) 
     {
       // add this to result
-
       res->Add(t1->id, t2->id);
     }
 #else

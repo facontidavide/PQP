@@ -40,6 +40,7 @@
 
 #include "Tri.h"
 #include "BV.h"
+#include <vector>
 
 class PQP_Model
 {
@@ -48,9 +49,7 @@ public:
 
   int build_state;
 
-  Tri *tris;  
-  int num_tris;
-  int num_tris_alloced;
+  std::vector<Tri> tris;
 
   BV *b;
   int num_bvs;

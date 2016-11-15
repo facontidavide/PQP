@@ -40,7 +40,7 @@
 
 #include <stdio.h>
 #include <math.h>
-#include "PQP.h"
+#include "../../src/PQP.h"
 
 #define PI 3.14159265359
 #define LISTS 0
@@ -76,7 +76,7 @@ main()
       PQP_REAL v1 = (PQP_REAL)(2.0*PI*vc) / n2; 
       PQP_REAL v2 = (PQP_REAL)(2.0*PI*(vc+1)) / n2; 
 
-      PQP_REAL p1[3], p2[3], p3[3], p4[3];
+      Vector p1, p2, p3, p4;
 
       p1[0] = (a - b * cos(v1)) * cos(u1);
       p2[0] = (a - b * cos(v1)) * cos(u2);
@@ -116,7 +116,8 @@ main()
 
   // this placement causes them to overlap a large amount.
 
-  PQP_REAL R1[3][3], R2[3][3], T1[3], T2[3];
+  Matrix R1, R2;
+  Vector T1, T2;
   
   R1(0,0) = R1(1,1) = R1(2,2) = 1.0;
   R1(0,1) = R1(1,0) = R1(2,0) = 0.0;
